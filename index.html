@@ -159,7 +159,7 @@
 <section class="section" id="setup">
     <h3>🔰 初期設定</h3>
 
-    <p>Botを追加したら、まず次の 5 つを設定してください。</p>
+    <p>Botを追加したら、まず次の 6 つを設定してください。</p>
 
     <h4>① モード設定</h4>
     <div class="command-box">/mode</div>
@@ -174,9 +174,11 @@
     <h4>④ 自動防衛（AutoDefense）の有効化</h4>
     <div class="command-box">/autodef set on</div>
 
-    <h4>⑤ 許可するBOTの設定（荒らしbotの対策です）</h4>
+    <h4>⑤ 許可するBOTの設定（@なしで追加できます）</h4>
     <div class="command-box">/allowbot add &lt;BOT ID&gt;</div>
 
+    <h4>⑥ 連続メンション制限のオン/オフ</h4>
+    <div class="command-box">/antimention set &lt;on/off&gt;</div>
 </section>
 
 <section class="section" id="features">
@@ -188,7 +190,7 @@
         </div>
         <div class="card">
             <h4>🛡 ロール/チャンネル保護</h4>
-            <p>大量生成や削除を検知して攻撃者の権限を即停止します。</p>
+            <p>大量生成/削除を検知して攻撃者の権限を即停止します。</p>
         </div>
         <div class="card">
             <h4>🚫 ワード検知</h4>
@@ -196,7 +198,15 @@
         </div>
         <div class="card">
             <h4>📣 管理者DM通知</h4>
-            <p>荒らし・BOT異常行動を瞬時に通知します。</p>
+            <p>荒らし行動を瞬時に通知します。</p>
+        </div>
+        <div class="card">
+            <h4>📡 Webhook 防止</h4>
+            <p>認証済みBOT以外の Webhook を完全ブロックします。</p>
+        </div>
+        <div class="card">
+            <h4>👻 ステルスBOT</h4>
+            <p>Botをオフライン常にオフライン状態にすることでステルス性を保ちます。</p>
         </div>
     </div>
 </section>
@@ -213,11 +223,14 @@
     <h4>■ サーバーアンロック</h4>
     <div class="command-box">/serverunlock</div>
 
-    <h4>■ 特定のユーザーに警告DMを送ります</h4>
-    <div class="command-box">/waron</div>
+    <h4>■ 特定ユーザーに警告DMを送信</h4>
+    <div class="command-box">/warn</div>
 
-    <h4>■ 通報</h4>
-    <div class="command-box">/report</div>
+    <h4>■ 許可BOTの追加</h4>
+    <div class="command-box">/allowbot add &lt;BOT ID&gt;</div>
+
+    <h4>■ 連続メンション対策</h4>
+    <div class="command-box">/antimention set &lt;on/off&gt;</div>
 </section>
 
 <section class="section" id="support">
@@ -234,5 +247,3 @@
 
 </body>
 </html>
-
-
