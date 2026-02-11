@@ -3,483 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server防衛BOT | 安心安全の荒らし対策BOT</title>
-    
+    <meta name="description" content="かろEarthの商品情報ポータルサイトです。鯖民の出品情報をリアルタイムで公開中。（このサイトは非公式です。）">
+    <title>かろEarth商品ポータル</title>
     <style>
-        /* ------------------------------------- */
-        /* リセットと基本設定 */
-        /* ------------------------------------- */
+        :root {
+            --mc-green: #3cfb00;
+            --mc-aqua: #55ffff;
+            --mc-gold: #ffaa00;
+            --cyber-bg: #0d0d0d;
+            --panel-bg: rgba(20, 20, 20, 0.9);
+        }
+
         body {
-            font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif; /* プロフェッショナルなフォント */
-            margin: 0;
-            padding: 0;
-            line-height: 1.7;
-            color: #444;
-            background-color: #f0f2f5; /* 背景色をやや濃いグレーに */
+            background-color: var(--cyber-bg);
+            background-image:
+                linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .03) 25%, rgba(255, 255, 255, .03) 26%, transparent 27%),
+                linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .03) 25%, rgba(255, 255, 255, .03) 26%, transparent 27%);
+            background-size: 40px 40px;
+            color: #eee;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin: 0; padding: 20px;
         }
+
+        .header { text-align: center; padding: 20px 0 40px; }
+        .header h1 { color: var(--mc-aqua); font-size: 2.2rem; text-shadow: 0 0 15px var(--mc-aqua); margin: 0; letter-spacing: 4px; }
+
+        .main-container { display: grid; grid-template-columns: 1fr 350px; gap: 25px; max-width: 1200px; margin: 0 auto; }
+
+        section {
+            background: var(--panel-bg); border: 1px solid #333; padding: 25px;
+            border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 25px;
+        }
+
+        h2 { font-size: 1.1rem; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 25px 0;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #888; font-size: 0.75rem; border-bottom: 2px solid #333; padding: 10px; }
+        td { padding: 14px 10px; border-bottom: 1px solid #222; font-size: 0.9rem; }
 
-        a {
-            color: #00bcd4; /* シアン */
-            text-decoration: none;
-        }
+        .coordinate { color: var(--mc-aqua); font-weight: bold; }
+        .price { color: var(--mc-green); font-weight: bold; }
+        .seller-tag { color: #777; font-size: 0.8rem; }
 
-        a:hover {
-            text-decoration: underline;
+        .btn-order {
+            background: transparent; border: 1px solid var(--mc-aqua); color: var(--mc-aqua);
+            padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;
         }
+        .btn-order:hover { background: var(--mc-aqua); color: #000; }
 
-        h2, h3, h4 {
-            font-weight: 700;
-            color: #1A1A1A; /* 濃いチャコール */
-            margin-bottom: 20px;
-        }
+        .auth-panel { border: 1px solid var(--mc-aqua); position: sticky; top: 20px; }
+        .input-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        input, select { background: #000; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 4px; font-family: inherit; }
         
-        .section-title {
-            text-align: center;
-            font-size: 2.6em; /* 見出しを大きく */
-            margin-bottom: 60px;
-            position: relative;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-transform: uppercase; /* 大文字で強調 */
+        .btn-submit {
+            background: var(--mc-aqua); color: #000; border: none; padding: 15px;
+            font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase;
         }
+        .btn-submit:disabled { background: #555; cursor: not-allowed; }
         
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 70px;
-            height: 4px;
-            background-color: #00bcd4; /* シアン */
-            margin: 15px auto 0;
-            border-radius: 2px;
-        }
+        .order-item { background: #1a1a1a; padding: 10px; margin-bottom: 8px; border-left: 3px solid var(--mc-aqua); font-size: 0.8rem; }
+        .btn-logout { background: #444; color: #fff; border: none; padding: 8px; font-size: 0.7rem; cursor: pointer; width: 100%; margin-top: 10px; }
 
-        /* ------------------------------------- */
-        /* ヘッダーとナビゲーション */
-        /* ------------------------------------- */
-        header {
-            background-color: #1A1A1A; /* 濃いチャコールグレー */
-            color: white;
-            padding: 18px 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0;
-        }
-
-        .logo {
-            margin: 0;
-            font-size: 1.8em;
-            font-weight: 900;
-            color: #00bcd4; /* シアンでロゴを強調 */
-            letter-spacing: 1px;
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-
-        nav ul li {
-            margin-left: 35px;
-        }
-
-        nav ul li a {
-            color: white;
-            font-weight: 500;
-            padding: 5px 0;
-            transition: color 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        nav ul li a:hover {
-            color: #00bcd4;
-            text-decoration: none;
-        }
-
-        /* ------------------------------------- */
-        /* ボタンのスタイル */
-        /* ------------------------------------- */
-        .btn {
-            display: inline-block;
-            padding: 16px 45px;
-            border-radius: 4px; /* 角を少し丸く */
-            font-weight: 600;
-            text-align: center;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-            text-decoration: none !important;
-            margin-top: 35px;
-            font-size: 1.1em;
-            letter-spacing: 0.8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            text-transform: uppercase;
-        }
-
-        .btn-cta {
-            background-color: #00bcd4; /* シアン */
-            color: #1A1A1A; /* 濃いチャコール */
-            border: none;
-        }
-        
-        .btn-cta:hover {
-            background-color: #0097a7; /* 濃いシアン */
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-        }
-
-        /* ------------------------------------- */
-        /* ヒーローセクション */
-        /* ------------------------------------- */
-        #hero {
-            background: 
-                linear-gradient(rgba(26, 26, 26, 0.85), rgba(26, 26, 26, 0.85)), /* 濃いチャコールオーバーレイ */
-                url('https://images.unsplash.com/photo-1579296564991-b1e6f98a39d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
-            color: white;
-            text-align: center;
-            padding: 160px 0;
-            min-height: 550px;
-        }
-
-        #hero h2 {
-            font-size: 3.8em; 
-            margin-bottom: 25px;
-            font-weight: 900;
-            color: white;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-            line-height: 1.2;
-        }
-
-        #hero p {
-            font-size: 1.3em; 
-            color: #cfd8dc; /* 薄いグレー */
-            max-width: 900px;
-            margin: 0 auto 40px;
-            letter-spacing: 0.3px;
-        }
-        
-        /* ヒーローセクション内の数値実績 */
-        .stats-bar {
-            background-color: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-around;
-            max-width: 800px;
-            margin: 40px auto 0;
-        }
-        .stat-item {
-            color: white;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        .stat-item span {
-            display: block;
-            font-size: 2.5em;
-            font-weight: 900;
-            color: #00bcd4;
-            line-height: 1.2;
-        }
-
-        /* ------------------------------------- */
-        /* ソリューションセクション (機能) */
-        /* ------------------------------------- */
-        .content-section {
-            padding: 80px 0;
-        }
-        
-        .bg-white {
-            background-color: white;
-        }
-
-        .solution-grid {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .solution-item {
-            flex-basis: calc(33.333% - 20px);
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            border-left: 5px solid #00bcd4; /* シアンのライン */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            text-align: left;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .solution-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .solution-item h4 {
-            color: #1A1A1A;
-            font-size: 1.3em;
-            margin-top: 15px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .solution-icon {
-            width: 60px;
-            height: 60px;
-            background-color: #00bcd4;
-            color: white;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-        
-        /* ------------------------------------- */
-        /* 導入プロセス (サービス導入ステップ) */
-        /* ------------------------------------- */
-        #process {
-             background-color: #f0f2f5;
-             padding: 80px 0;
-        }
-        
-        .process-steps {
-            display: flex;
-            justify-content: space-between;
-            gap: 40px;
-            margin-top: 50px;
-        }
-        
-        .step-item {
-            flex-basis: calc(33.333% - 26.666px);
-            padding: 30px 20px;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-        
-        .step-item span {
-            display: block;
-            font-size: 3.5em;
-            font-weight: 900;
-            color: #00bcd4;
-            line-height: 1;
-            margin-bottom: 15px;
-        }
-        
-        /* ------------------------------------- */
-        /* フッター */
-        /* ------------------------------------- */
-        footer {
-            background-color: #1A1A1A;
-            color: #ccc;
-            padding: 40px 0;
-            font-size: 0.9em;
-            text-align: center;
-        }
-
-        footer .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .footer-links {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-
-        .footer-links li {
-            margin-left: 25px;
-        }
-
-        .footer-links a {
-            color: #ccc;
-        }
-
-        .footer-links a:hover {
-            color: #00bcd4;
-            text-decoration: none;
-        }
-        
-        /* レスポンシブ対応 */
-        @media (max-width: 992px) {
-            .solution-item {
-                flex-basis: calc(50% - 15px);
-            }
-            .process-steps {
-                flex-direction: column;
-            }
-            .stats-bar {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #hero h2 {
-                font-size: 2.8em;
-            }
-            #hero p {
-                font-size: 1.1em;
-            }
-            .solution-item {
-                flex-basis: 100%;
-            }
-            nav ul li {
-                margin-left: 15px;
-            }
-            footer .container {
-                flex-direction: column;
-            }
-            .section-title {
-                font-size: 2em;
-            }
-        }
-
+        #login-form, #user-dashboard { display: none; }
+        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } .auth-panel { position: static; } }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="container">
-            <h1 class="logo">Server防衛BOT</h1>
-            <nav>
-                <ul>
-                    <li><a href="#solutions">ソリューション</a></li>
-                    <li><a href="#process">導入プロセス</a></li>
-                    <li><a href="#contact">サポート</a></li>
-                    <li><a href="#">技術仕様</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+<header class="header"><h1>かろEarth商品ポータル</h1></header>
 
-    <section id="hero">
-        <div class="container">
-            <h2>貴方のサーバーを守る、防衛BOT</h2>
-            <p>自動防衛システムが、荒らし行為、スパム、荒らし行為からサーバーを24時間365日保護します。信頼性を確保し、安心して使用できる環境を提供します。</p>
-            <a href="https://discord.com/oauth2/authorize?client_id=1437806290238967849&permissions=8&integration_type=0&scope=applications.commands+bot" target="_blank" class="btn btn-cta">Server防衛BOTを今すぐ導入</a>
-            
-            <div class="stats-bar">
-                <div class="stat-item"><span>99.999%</span> 稼働率</div>
-                <div class="stat-item"><span>98%</span> 満足度</div>
-                <div class="stat-item"><span>100%</span> 荒らし防止度</div>
+<div class="main-container">
+    <main>
+        <section>
+            <h2 style="color: var(--mc-aqua);">🛒 商品検索</h2>
+            <div class="controls">
+                <input type="search" id="search-box" placeholder="商品名や出品者で検索..." oninput="renderTable()">
+                <select id="sort-select" onchange="renderTable()">
+                    <option value="newest">新着順</option>
+                    <option value="price-asc">価格の安い順</option>
+                    <option value="price-desc">価格の高い順</option>
+                </select>
             </div>
-        </div>
-    </section>
+            <table>
+                <thead>
+                    <tr><th>品目</th><th>単価</th><th>座標</th><th>状況</th><th>出品者</th><th>操作</th></tr>
+                </thead>
+                <tbody id="trade-tbody"></tbody>
+            </table>
+        </section>
+    </main>
 
-    <section id="solutions" class="content-section bg-white">
-        <div class="container">
-            <h3 class="section-title">提供する主要機能</h3>
-            <div class="solution-grid">
-                
-                <div class="solution-item">
-                    <div class="solution-icon">🛡️</div>
-                    <h4>統合型ディフェンスボット</h4>
-                    <p>高速連投、外部からのリンク爆撃、新規アカウントによる集団攻撃など、あらゆる脅威を自動検知・瞬時に隔離します。</p>
-                </div>
-                
-                <div class="solution-item">
-                    <div class="solution-icon">🔒</div>
-                    <h4>高度な権限アクセス管理 (IAM)</h4>
-                    <p>管理者権限の不正利用やロール・チャンネルの大量生成/削除を検知。攻撃者の権限を即座に停止し、システム破壊を阻止します。</p>
-                </div>
-                
-                <div class="solution-item">
-                    <div class="solution-icon">👁️</div>
-                    <h4>インテリジェント・コンテンツ監視</h4>
-                    <p>危険ワードが含まれたメッセージを削除し、内容を管理者に即座に通知。内部・外部のリスクを監視します。</p>
-                </div>
-                
-                <div class="solution-item">
-                    <div class="solution-icon">🚨</div>
-                    <h4>リアルタイム・インシデント通知</h4>
-                    <p>荒らし行動やシステムへの不正アクセスを検知した際、詳細な状況を管理者にDMで瞬時に通知。初動対応を迅速化します。</p>
-                </div>
-                
-                <div class="solution-item">
-                    <div class="solution-icon">🚫</div>
-                    <h4>WebHookセキュリティ強化</h4>
-                    <p>認証済みのBot以外からの不正なWebHookメッセージをシステムレベルで完全にブロック。外部からの情報操作を防御します。</p>
-                </div>
-                
-                <div class="solution-item">
-                    <div class="solution-icon">👻</div>
-                    <h4>ステルス・モード運用</h4>
-                    <p>Platformを常時オフライン状態で稼働させることで、攻撃者に対する存在感と脆弱性の露出を最小限に抑えます。</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <section id="process" class="content-section">
-        <div class="container" style="text-align: center;">
-            <h3 class="section-title">ServerDefense Platform 導入プロセス</h3>
-            <p style="max-width: 800px; margin: 0 auto 50px;">当Platformの導入は、お客様のセキュリティニーズに合わせたシンプルかつ効率的なステップで進行します。</p>
-            
-            <div class="process-steps">
-                <div class="step-item">
-                    <span>1</span>
-                    <h4>防衛モード設定</h4>
-                    <p>/modeで、３種類の防衛モードから選択してください</p>
-                </div>
-                <div class="step-item">
-                    <span>2</span>
-                    <h4>自動防衛（AutoDefense）の有効化</h4>
-                    <p>これにより、bot自身が自動で防衛します。</p>
-                </div>
-                <div class="step-item">
-                    <span>3</span>
-                    <h4> 許可するBOTの設定</h4>
-                    <p>/allowbot "BOT ID"で、サーバーに導入したい未承認botをホワイトリストに追加できます。</p>
+    <aside>
+        <section class="auth-panel">
+            <div id="login-form">
+                <h2 style="color: var(--mc-aqua);">👤 出品者ログイン</h2>
+                <div class="input-group">
+                    <input type="text" id="auth-mcid" placeholder="あなたのMCIDを入力">
+                    <button class="btn-submit" onclick="login()">管理画面を開く</button>
+                    <p style="font-size:0.7rem; color:#888;">※パスワードはありません。ご自身のMCIDを入力してください。</p>
                 </div>
             </div>
-            
-        </div>
-    </section>
 
-    <section id="contact" class="content-section" style="background-color: #1A1A1A; color: white;">
-        <div class="container" style="text-align: center;">
-            <h3 style="color: white; margin-bottom: 10px;">お問い合わせ・テクニカルサポート</h3>
-            <p style="font-size: 1.1em; max-width: 800px; margin: 0 auto 30px;">サービス導入に関するご質問や技術的なサポート、パートナーシップのご相談は、以下のサーバーより承っております。</p>
-            <a href="https://discord.gg/bhZQYDnJzk" target="_blank" class="btn btn-cta" style="background-color: white; color: #1A1A1A;">お問い合わせサーバーへ</a>
-        </div>
-    </section>
+            <div id="user-dashboard">
+                <h2 style="color: var(--mc-aqua);">⚒️ 出品管理</h2>
+                <p id="welcome-msg" style="font-size: 0.8rem; color: var(--mc-aqua); margin-bottom: 15px;"></p>
+                
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <input type="text" id="in-name" placeholder="商品名">
+                    <input type="text" id="in-price" placeholder="価格">
+                    <input type="text" id="in-coords" placeholder="座標(X / Z)">
+                    <select id="in-stock">
+                        <option value="在庫あり">在庫あり</option>
+                        <option value="在庫僅少">在庫僅少</option>
+                        <option value="受注生産">受注生産</option>
+                    </select>
+                    <input type="text" id="hp_field" style="display:none !important;" tabindex="-1">
+                    <button class="btn-submit" id="submit-btn" onclick="submitTrade()">出品・更新する</button>
+                </div>
 
-    <footer>
-        <div class="container">
-            <p class="copyright">© 2025 ServerDefense Platform. All Rights Reserved.</p>
-            <ul class="footer-links">
-                <li><a href="#">利用規約</a></li>
-                <li><a href="#">プライバシーポリシー</a></li>
-                <li><a href="#">技術仕様書</a></li>
-            </ul>
-        </div>
-    </footer>
+                <div id="my-products-container" style="margin-top:20px; border-top:1px solid #333; padding-top:10px;">
+                    <h3 style="font-size:0.8rem;">あなたの出品中リスト</h3>
+                    <div id="my-prods-list"></div>
+                </div>
 
+                <div class="order-list" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 15px;">
+                    <h3 style="font-size: 0.9rem; color: var(--mc-gold);">📩 届いた注文</h3>
+                    <div id="received-orders"></div>
+                </div>
+                <button class="btn-logout" onclick="logout()">ログアウト</button>
+            </div>
+        </section>
+    </aside>
+</div>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwgOZAdKPfNjI_kL6RUmrFaFN3KicqyWTpOiORipcLjREa8zNeyGQ2zT8K6Z1nKtEuK/exec";
+    let currentData = { products: [], orders: [] }; 
+    let currentUser = JSON.parse(localStorage.getItem('trade_user_new')) || null;
+    function getBotCheck() {
+        const n1 = Math.floor(Math.random() * 10) + 1;
+        const n2 = Math.floor(Math.random() * 10) + 1;
+        const ans = prompt(`${n1} + ${n2} は？ (ボット対策)`);
+        return { user_ans: ans, captcha_ans: n1 + n2 };
+    }
+
+    async function loadTradeData() {
+        try {
+            const res = await fetch(GAS_URL + "?t=" + Date.now());
+            const data = await res.json();
+            currentData.products = data.products || [];
+            currentData.orders = data.orders || [];
+            renderTable();
+            renderOrders();
+            renderMyProducts();
+        } catch (e) { console.error("データ読み込み失敗"); }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('trade-tbody');
+        const search = document.getElementById('search-box').value.toLowerCase();
+        const filtered = currentData.products.filter(d => 
+            d.name.toLowerCase().includes(search) || d.seller.toLowerCase().includes(search)
+        );
+        tbody.innerHTML = filtered.map(item => `
+            <tr>
+                <td><strong>${item.name}</strong></td>
+                <td class="price">${item.price}</td>
+                <td class="coordinate">${item.coords}</td>
+                <td style="font-size:0.8rem;">${item.stock}</td>
+                <td class="seller-tag">${item.seller}</td>
+                <td><button class="btn-order" onclick="placeOrder('${item.seller}', '${item.name}')">注文</button></td>
+            </tr>
+        `).join('');
+    }
+
+    async function submitTrade() {
+        if (!currentUser) return;
+        const bot = getBotCheck();
+        if (!bot.user_ans) return;
+
+        const payload = {
+            action: "updateProduct",
+            seller: currentUser.mcid,
+            name: document.getElementById('in-name').value,
+            price: document.getElementById('in-price').value,
+            coords: document.getElementById('in-coords').value,
+            stock: document.getElementById('in-stock').value,
+            hp_field: document.getElementById('hp_field').value,
+            user_ans: bot.user_ans,
+            captcha_ans: bot.captcha_ans
+        };
+
+        if (!payload.name) return alert("商品名は必須です");
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+            const result = await res.json();
+            if (result.status === "success") {
+                alert("更新完了！");
+                loadTradeData();
+            } else { alert(result.message); }
+        } catch (e) { alert("送信失敗"); }
+        btn.disabled = false;
+    }
+
+    async function placeOrder(seller, productName) {
+        const buyer = prompt("注文者(あなたのMCID)を入力してください");
+        if (!buyer) return;
+        const bot = getBotCheck();
+        if (!bot.user_ans) return;
+
+        try {
+            const res = await fetch(GAS_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ 
+                    action: "placeOrder", buyer, seller, productName,
+                    user_ans: bot.user_ans, captcha_ans: bot.captcha_ans
+                }) 
+            });
+            const result = await res.json();
+            if (result.status === "success") {
+                alert("注文を送信しました！");
+                loadTradeData();
+            } else { alert(result.message); }
+        } catch (e) { alert("注文失敗"); }
+    }
+
+    function renderMyProducts() {
+        const list = document.getElementById('my-prods-list');
+        if (!currentUser || !list) return;
+        const myProds = currentData.products.filter(p => p.seller === currentUser.mcid);
+        list.innerHTML = myProds.map(p => `
+            <div style="font-size:0.75rem; border-bottom:1px solid #222; padding:5px; display:flex; justify-content:space-between;">
+                <span>${p.name}</span>
+                <button onclick="deleteProduct('${p.name}')" style="color:#ff4444; background:none; border:none; cursor:pointer;">[削除]</button>
+            </div>
+        `).join('');
+    }
+
+    async function deleteProduct(name) {
+        if (!confirm("削除しますか？")) return;
+        const bot = getBotCheck();
+        await fetch(GAS_URL, { method:"POST", body:JSON.stringify({
+            action:"deleteProduct", name, seller:currentUser.mcid,
+            user_ans: bot.user_ans, captcha_ans: bot.captcha_ans
+        })});
+        loadTradeData();
+    }
+
+    function renderOrders() {
+        const container = document.getElementById('received-orders');
+        if (!currentUser || !container) return;
+        const myOrders = currentData.orders.filter(o => o.seller === currentUser.mcid);
+        container.innerHTML = myOrders.map(o => `
+            <div class="order-item">
+                <b>${o.buyer}</b> → ${o.productName}
+                <button onclick="deleteOrder('${o.id}')" style="color:#ff4444; background:none; border:none; cursor:pointer; float:right;">[完了]</button>
+            </div>
+        `).join('');
+    }
+
+    async function deleteOrder(orderId) {
+        const bot = getBotCheck();
+        await fetch(GAS_URL, { method:"POST", body:JSON.stringify({
+            action:"deleteOrder", orderId,
+            user_ans: bot.user_ans, captcha_ans: bot.captcha_ans
+        })});
+        loadTradeData();
+    }
+
+    function checkAuth() {
+        const loginForm = document.getElementById('login-form');
+        const dashboard = document.getElementById('user-dashboard');
+        if (currentUser) {
+            loginForm.style.display = 'none';
+            dashboard.style.display = 'block';
+            document.getElementById('welcome-msg').innerText = `MCID: ${currentUser.mcid}`;
+            renderMyProducts();
+            renderOrders();
+        } else {
+            loginForm.style.display = 'block';
+            dashboard.style.display = 'none';
+        }
+    }
+
+    function login() {
+        const mcid = document.getElementById('auth-mcid').value;
+        if (!mcid) return alert("MCIDを入力してください");
+        currentUser = { mcid };
+        localStorage.setItem('trade_user_new', JSON.stringify(currentUser));
+        checkAuth();
+    }
+
+    function logout() {
+        localStorage.removeItem('trade_user_new');
+        currentUser = null;
+        checkAuth();
+    }
+
+    window.onload = () => {
+        checkAuth();
+        loadTradeData();
+        setInterval(loadTradeData, 60000);
+    };
+</script>
 </body>
 </html>
-
