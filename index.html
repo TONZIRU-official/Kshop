@@ -101,7 +101,7 @@
                 <div class="input-group">
                     <input type="text" id="auth-mcid" placeholder="あなたのMCIDを入力">
                     <button class="btn-submit" onclick="login()">管理画面を開く</button>
-                    <p style="font-size:0.7rem; color:#888;">※パスワードはありません。ご自身のMCIDを入力してください。</p>
+                    <p style="font-size:0.7rem; color:#888;">※正確なMCIDを入力してください。</p>
                 </div>
             </div>
 
@@ -144,7 +144,7 @@
     function getBotCheck() {
         const n1 = Math.floor(Math.random() * 10) + 1;
         const n2 = Math.floor(Math.random() * 10) + 1;
-        const ans = prompt(`${n1} + ${n2} は？ (ボット対策)`);
+        const ans = prompt(`${n1} + ${n2} は？ `);
         return { user_ans: ans, captcha_ans: n1 + n2 };
     }
 
@@ -312,3 +312,4 @@
 </script>
 </body>
 </html>
+
